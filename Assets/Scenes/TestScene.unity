@@ -322,8 +322,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 445633486}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.5}
-  m_LocalScale: {x: 1, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1763905497}
   m_Father: {fileID: 1335069109}
@@ -639,7 +639,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   forceMultiplier: 500
-  trail: {fileID: 0}
+  trailHolder: {fileID: 445633486}
+  trailSize_scaleMultiplier: 2
+  applyForce: 0
 --- !u!1 &1335165020
 GameObject:
   m_ObjectHideFlags: 0
