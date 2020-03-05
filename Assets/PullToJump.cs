@@ -5,14 +5,16 @@ using UnityEngine;
 public class PullToJump : MonoBehaviour
 {
     private Rigidbody rb;
+    private Camera mainCamera;
 
     //calculate throw distance
-    public float forceMultiplier = 10f;
+    public float forceMultiplier = 500f, yForceMultiplier = 1.5f, minForce, maxForce;
 
     private Vector3 startPos, tempPos, endPos;
+    private bool canJump = false;
 
     //calculate rotation
-    private Vector3 direction;
+    private Vector3 direction, playerPos;
     private float angle;
 
     //original & current trail size
@@ -27,56 +29,93 @@ public class PullToJump : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+        mainCamera = Camera.main;
         trailSize_original = trailHolder.transform.localScale;
+
+        minForce *= forceMultiplier;
+        maxForce *= forceMultiplier;
     }
 
     private void Update()
     {
-        //only trigger this is player is on ground/furniture
-        if(Input.GetMouseButtonDown(0))
+        //only jump if player is on ground/furniture/ "SafeToStandOn"
+        if (canJump)
         {
-            startPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
-            //print("start position = " + startPos);
-        }
-        if(Input.GetMouseButton(0))
-        {
-            //dont rotate camera for if mouse pointer is in front of player
-            tempPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
-            var tempCalc = (startPos - tempPos);
-            
-            //rotate the player while dragging
-            direction = Camera.main.WorldToViewportPoint(transform.position) - tempPos;
-            angle = (Mathf.Atan2(direction.y, -direction.x) * Mathf.Rad2Deg) - 90f;
-            transform.rotation = Quaternion.AngleAxis(angle, transform.up);
-
-            //scale trail to Y force
-            trailHolder.transform.localScale = new Vector3(trailSize_original.x, trailSize_original.y, (trailSize_original.z + tempCalc.y) * trailSize_scaleMultiplier);
-        }
-        if (Input.GetMouseButtonUp(0))
-        {
-            endPos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
-
-            //calculate the distance to be thrown.
-            var tempCalc = (startPos - endPos);
-            //print("end position = " + endPos);
-            //print("distance is = " + tempCalc);
-
-            //apply force only if the pointer is below the player only
-
-            //apply equal Y forces in the Y & Z axis
-            //experiment with higher Y forces than Z, because height decreases faster due to gravity
-            var forceVector = (new Vector3(0f, tempCalc.y, tempCalc.y)) * forceMultiplier;
-
-            //apply force only if force is more than deadzone
-            if (applyForce)
+            if (Input.GetMouseButtonDown(0))
             {
-                rb.AddRelativeForce(forceVector);
-                //insert haptics here
+                startPos = mainCamera.ScreenToViewportPoint(Input.mousePosition);
+                print("start position = " + startPos);
             }
-            //print("force vector = " + forceVector);
+            if (Input.GetMouseButton(0))
+            {
+                tempPos = mainCamera.ScreenToViewportPoint(Input.mousePosition);
+                var distanceCalc = Mathf.Sqrt((Mathf.Pow(tempPos.x - startPos.x, 2f) + Mathf.Pow(tempPos.y - startPos.y, 2f)));
 
-            //revert trail to original size
-            trailHolder.transform.localScale = trailSize_original;
+
+                //dont rotate camera for if mouse pointer is in front of player
+                if (startPos.y > tempPos.y)
+                {
+                    //print("should rotate");
+
+                    //rotate the player while dragging
+                    direction = mainCamera.WorldToViewportPoint(transform.position) - tempPos;
+                    angle = (Mathf.Atan2(direction.y, -direction.x) * Mathf.Rad2Deg) - 90f;
+                    angle = Mathf.Clamp(angle, -70f, 70f);
+                    transform.rotation = Quaternion.AngleAxis(angle, transform.up);
+
+                    //scale trail to Y force
+                    trailHolder.transform.localScale =
+                        new Vector3(trailSize_original.x,
+                        trailSize_original.y,
+                        distanceCalc * trailSize_scaleMultiplier);
+                }
+                else
+                {
+                    //**maybe slow the rotate rate (lol or maybe introduce a rotate rate)
+                    //print("shouldnt rotate");
+                }
+            }
+            if (Input.GetMouseButtonUp(0))
+            {
+                endPos = mainCamera.ScreenToViewportPoint(Input.mousePosition);
+
+                //calculate the distance to be thrown.
+                var distanceCalc = Mathf.Sqrt((Mathf.Pow(endPos.x - startPos.x, 2f) + Mathf.Pow(endPos.y - startPos.y, 2f)));
+
+                //print("end position = " + endPos);
+                //print("distance is = " + distanceCalc);
+
+                //apply equal Y forces in the Y & Z axis
+                //higher Y forces than Z is definitely better, because height decreases faster due to gravity
+                var forceVector = new Vector3(0f,
+                    Mathf.Clamp(distanceCalc * yForceMultiplier * forceMultiplier, minForce * yForceMultiplier, maxForce * yForceMultiplier),
+                    Mathf.Clamp(distanceCalc * forceMultiplier, minForce, maxForce));
+
+                //apply force only if force is more than deadzone
+                if (applyForce)
+                {
+                    //apply force only if the pointer is below the player only
+                    if (startPos.y > tempPos.y)
+                    {
+                        rb.AddRelativeForce(forceVector);
+                        print("applied force = " + forceVector);
+                        //insert haptics here
+                    }
+                }
+
+                //revert trail to original size
+                trailHolder.transform.localScale = trailSize_original;
+                canJump = false;
+            }
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.CompareTag("SafeToStandOn"))
+        {
+            canJump = true;
+            print("SafeToStandOn");
         }
     }
 }
