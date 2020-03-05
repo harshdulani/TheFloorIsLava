@@ -67,7 +67,7 @@ public class PullToJump : MonoBehaviour
                     trailHolder.transform.localScale =
                         new Vector3(trailSize_original.x,
                         trailSize_original.y,
-                        distanceCalc * trailSize_scaleMultiplier);
+                        Mathf.Clamp(distanceCalc * trailSize_scaleMultiplier, 0f, 3f));
                 }
                 else
                 {
@@ -91,6 +91,7 @@ public class PullToJump : MonoBehaviour
                     Mathf.Clamp(distanceCalc * yForceMultiplier * forceMultiplier, minForce * yForceMultiplier, maxForce * yForceMultiplier),
                     Mathf.Clamp(distanceCalc * forceMultiplier, minForce, maxForce));
 
+
                 //apply force only if force is more than deadzone
                 if (applyForce)
                 {
@@ -99,13 +100,14 @@ public class PullToJump : MonoBehaviour
                     {
                         rb.AddRelativeForce(forceVector);
                         print("applied force = " + forceVector);
+                        canJump = false;
                         //insert haptics here
                     }
                 }
 
                 //revert trail to original size
                 trailHolder.transform.localScale = trailSize_original;
-                canJump = false;
+                
             }
         }
     }
@@ -116,6 +118,10 @@ public class PullToJump : MonoBehaviour
         {
             canJump = true;
             print("SafeToStandOn");
+        }
+        if(collision.gameObject.CompareTag("Lava"))
+        {
+            print("you dead, bitch");
         }
     }
 }
