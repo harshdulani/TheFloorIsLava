@@ -4,9 +4,12 @@ using UnityEngine;
 
 public class JumpManager : MonoBehaviour
 {
+    public ArcLineRenderer alr;
+
     public static float setPowerX = 0f;
     public float maximumJumpForce = 7.5f;
     public float forceMultiplier = 7.5f;
+    public float forceOvershootMultiplier = 1.2f;   //this is to overcome current "ideal" jump being super easy
 
     //better jumping
     public float fallMultiplier = 2.5f;
@@ -18,7 +21,7 @@ public class JumpManager : MonoBehaviour
     private Vector3 forceVector;
 
     //flow control
-    public static bool FLOW_DEBUG = true;
+    public static bool FLOW_DEBUG = false;
     public static bool canJump = false;
     public static bool canRotate = false;
     public static bool canSetPower = false;
@@ -40,12 +43,12 @@ public class JumpManager : MonoBehaviour
         if (rb.velocity.y < -1f)
         {
             rb.velocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
-            print("falling");
+            //print("falling");
         }
         else if (rb.velocity.y > 1f && !Input.GetMouseButton(0))
         {
             rb.velocity += Vector3.up * Physics.gravity.y * (jumpMultiplier - 1) * Time.deltaTime;
-            print("rising");
+            //print("rising");
         }
     }
 
@@ -64,14 +67,19 @@ public class JumpManager : MonoBehaviour
         //MAKESHIFT VELOCITY BASED JUMP
         forceVector = (transform.up * maximumJumpForce * setPowerX) + (transform.forward * maximumJumpForce * setPowerX);
 
+        print(forceVector);
+
         rb.velocity = forceVector * forceMultiplier;
 
         if (FLOW_DEBUG)
             print("Jump");
 
         canJump = false;
+
+        //take care of other important vars
         forceVector = Vector3.zero;
         setPowerX = 0f;
+        alr.lr.enabled = false;
     }
 
     private void OnCollisionEnter(Collision collision)

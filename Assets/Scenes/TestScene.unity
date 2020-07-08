@@ -374,7 +374,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7114d3820cdb58b49a508850af76437c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocity: 8.75
+  lr: {fileID: 0}
+  maxVelocity: 9
   angle: 35
   resolution: 20
 --- !u!120 &162695303
@@ -1275,8 +1276,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1589e3b970c7714c9201adad8a763e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  alr: {fileID: 162695302}
   maximumJumpForce: 10
   forceMultiplier: 0.815
+  forceOvershootMultiplier: 1
   fallMultiplier: 2.5
   jumpMultiplier: 2
 --- !u!54 &715025256
@@ -1368,7 +1371,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   changePowerSpeed: 0.1
+  overshootMultiplier: 1.2
   sliderImage: {fileID: 472269951}
+  alr: {fileID: 162695302}
 --- !u!1 &920982478
 GameObject:
   m_ObjectHideFlags: 0
