@@ -6,7 +6,7 @@ public class JumpManager : MonoBehaviour
 {
     public static float setPowerX = 0f;
     public float maximumJumpForce = 7.5f;
-    public float maximumForwardForce = 7.5f;
+    public float forceMultiplier = 7.5f;
 
     //better jumping
     public float fallMultiplier = 2.5f;
@@ -18,7 +18,7 @@ public class JumpManager : MonoBehaviour
     private Vector3 forceVector;
 
     //flow control
-    public static bool FLOW_DEBUG = false;
+    public static bool FLOW_DEBUG = true;
     public static bool canJump = false;
     public static bool canRotate = false;
     public static bool canSetPower = false;
@@ -51,13 +51,20 @@ public class JumpManager : MonoBehaviour
 
     public void Jump()
     {
+        /*force based jump
         //calc force vector
         forceVector = (transform.up * maximumJumpForce * setPowerX) + (transform.forward * maximumJumpForce * setPowerX);
 
         print(forceVector);
 
         //apply force only if flick started from mid Y of screen
-        rb.AddForce(forceVector * maximumForwardForce);
+        rb.AddForce(forceVector * forceMultiplier);
+        */
+
+        //MAKESHIFT VELOCITY BASED JUMP
+        forceVector = (transform.up * maximumJumpForce * setPowerX) + (transform.forward * maximumJumpForce * setPowerX);
+
+        rb.velocity = forceVector * forceMultiplier;
 
         if (FLOW_DEBUG)
             print("Jump");

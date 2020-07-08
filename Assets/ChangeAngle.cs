@@ -17,7 +17,7 @@ public class ChangeAngle : MonoBehaviour
             if (Input.GetMouseButton(0))
             {
                 yaw += Input.GetAxis("Mouse X") * rotateSpeed;
-                transform.parent.eulerAngles = new Vector3(0f, invertMultiplier * yaw, 0f);
+                transform.eulerAngles = new Vector3(0f, invertMultiplier * yaw, 0f);
             }
             if(Input.GetMouseButtonUp(0))
             {
@@ -28,6 +28,7 @@ public class ChangeAngle : MonoBehaviour
                 JumpManager.canSetPower = true;
                 if (JumpManager.FLOW_DEBUG)
                     print("canSetPower = " + JumpManager.canSetPower);
+                print("rotation locked");
             }
         }
     }

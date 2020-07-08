@@ -20,15 +20,20 @@ public class SetPower : MonoBehaviour
             {
                 sliderImage.fillAmount += Input.GetAxis("Mouse Y") * -changePowerSpeed;
             }
-            if(Input.GetMouseButtonUp(0))
+            if (sliderImage.fillAmount > 0f)
             {
-                JumpManager.setPowerX = sliderImage.fillAmount;
-                sliderImage.fillAmount = 0f;
-                JumpManager.canSetPower = false;
-                if(JumpManager.FLOW_DEBUG)
-                    print("canSetPower = " + JumpManager.canSetPower);
+                if (Input.GetMouseButtonUp(0))
+                {
+                    JumpManager.setPowerX = sliderImage.fillAmount;
+                    sliderImage.fillAmount = 0f;
+                    JumpManager.canSetPower = false;
+                    if (JumpManager.FLOW_DEBUG)
+                        print("canSetPower = " + JumpManager.canSetPower);
 
-                JumpManager.callJump = true;
+                    print("power locked");
+
+                    JumpManager.callJump = true;
+                }
             }
         }
     }
